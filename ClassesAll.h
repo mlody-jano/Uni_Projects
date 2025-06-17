@@ -1,0 +1,9 @@
+#pragma once
+#include "Character.h"
+#include "Warrior.h"
+#include "Mage.h"
+#include "Archer.h"
+#include "CharacterFactory.h"
+#include "WarriorFactory.h"
+#include "MageFactory.h"
+#include "ArcherFactory.h"
