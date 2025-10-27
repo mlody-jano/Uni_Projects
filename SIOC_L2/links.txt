@@ -1,0 +1,7 @@
+matplotlib plotting images:
+
+https://matplotlib.org/stable/tutorials/images.html
+
+image for displaying interpolation:
+
+https://www.researchgate.net/figure/bit-256-x-256-Grayscale-Lena-Image_fig1_3935609
