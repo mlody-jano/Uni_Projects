@@ -25,6 +25,7 @@ image, cmap = load_image(path)
 
 nn_counter = 0
 bilinear_counter = 0
+bicubic_counter = 0
 
 current_img = np.asarray(image)
 img_display = ax.imshow(current_img, cmap=cmap)
@@ -38,9 +39,11 @@ nextbutton = Button(nextax, 'Next', color = axis_color, hovercolor = '0.975')
 # registering click on reset button, to change interpolation method change func in new_img = func(current_img)
 def button_clicked(mouse_event):
     global current_img, img_display
-    new_img = nearest_neighbor(current_img)
-    img_display.set_data(new_img)
-    current_img = new_img
+    temp = nearest_neighbor(current_img)
+    if temp is None:
+        return None
+    img_display.set_data(temp)
+    current_img = temp
     plt.draw()
 
 def show_summary(scaled_img):
@@ -53,18 +56,18 @@ def show_summary(scaled_img):
     ax2.imshow(scaled_img)
     ax2.set_title("Final Scaled Image")
     ax2.axis('off')
-    plt.show()
+    plt.show(block=False)
 
 
 nextbutton.on_clicked(button_clicked)
 
 # nearest neighbor interpolation function
 def nearest_neighbor(image):
+
     global nn_counter
 
     if(nn_counter < 5):
-
-        h, w, c= image.shape
+        h, w, c = image.shape
         new_h, new_w = int(h * 1.1), int(w * 1.1)
         new_img = np.zeros((new_h, new_w, c), dtype=image.dtype)
 
@@ -80,12 +83,14 @@ def nearest_neighbor(image):
         print(f"Height: {new_h}, Width: {new_w}")
 
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_nearest_neighbor_enlarged Scale: {np.pow(1.1,nn_counter):.2f}.jpg')
+        im.save(f'images/near_neigh/enlarged Scale: {np.pow(1.1,nn_counter + 1):.2f}.jpg')
+        nn_counter += 1
+        return new_img
     elif(nn_counter == 5):
         show_summary(current_img)
-
-    elif(nn_counter >= 5 and nn_counter < 10):
-
+        nn_counter += 1
+        return None
+    elif(nn_counter > 5 and nn_counter < 11):
         h, w, c = image.shape
         new_h, new_w = int(h / 1.1), int(w / 1.1)
         new_img = np.zeros((new_h, new_w, c), dtype=image.dtype)
@@ -102,20 +107,22 @@ def nearest_neighbor(image):
         print(f"Height: {new_h}, Width: {new_w}")
 
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_shrinked Scale: {np.pow(1.1,10 - nn_counter):.2f}.jpg')
-    
-    elif(nn_counter == 10):
+        im.save(f'images/near_neigh/shrinked Scale: {np.pow(1.1,10 - nn_counter):.2f}.jpg')
+        nn_counter += 1
+        return new_img
+    elif(nn_counter == 11):
         show_summary(current_img)
-        
-    nn_counter += 1
-    return new_img
+        nn_counter += 1
+        return None
+    else: 
+        print("Error! Out of bounds of interpolation number!")
+        exit()
 
 # bilinear interpolation function
 def bilinear_interpolation(image):
     global bilinear_counter
 
     if(bilinear_counter < 5):
-
         h, w, c= image.shape
         new_h, new_w = int(h * 1.1), int(w * 1.1)
         new_img = np.zeros((new_h, new_w, c), dtype=image.dtype)
@@ -140,12 +147,16 @@ def bilinear_interpolation(image):
 
         print(f"Scale: {np.pow(1.1,bilinear_counter + 1):.2f}")
         print(f"Height: {new_h}, Width: {new_w}")
-
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_bilinear_enlarged Scale: {np.pow(1.1,bilinear_counter + 1):.2f}.jpg')
+        im.save(f'images/bilinear/enlarged Scale: {np.pow(1.1,bilinear_counter + 1):.2f}.jpg')
+
+        bilinear_counter += 1
+        return new_img
     elif(bilinear_counter == 5):
         show_summary(current_img)
-    elif(bilinear_counter >= 5 and bilinear_counter < 10):
+        bilinear_counter += 1
+        return None
+    elif(bilinear_counter >= 5 and bilinear_counter < 11):
 
         h, w, c = image.shape
         new_h, new_w = int(h / 1.1), int(w / 1.1)
@@ -171,13 +182,18 @@ def bilinear_interpolation(image):
 
         print(f"Scale: {np.pow(1.1,10 - bilinear_counter):.2f}")
         print(f"Height: {new_h}, Width: {new_w}")
-
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_bilinear_shrinked Scale: {np.pow(1.1,10 - bilinear_counter):.2f}.jpg')
-    elif(bilinear_counter == 10):
+        im.save(f'images/bilinear/shrinked Scale: {np.pow(1.1,10 - bilinear_counter):.2f}.jpg')
+
+        bilinear_counter += 1
+        return new_img
+    elif(bilinear_counter == 11):
         show_summary(current_img)
-    bilinear_counter += 1
-    return new_img
+        bilinear_counter += 1
+        return None
+    else:
+        print("Error! Out of bounds of interpolation number!")
+        exit()
 
 # bicubic interpolation function
 def bicubic_interpolation(image):
@@ -195,9 +211,14 @@ def bicubic_interpolation(image):
         print(f"Height: {new_h}, Width: {new_w}")
 
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_bicubic_enlarged Scale: {np.pow(1.1,bicubic_counter):.2f}.jpg')
+        im.save(f'images/bicubic/enlarged Scale: {np.pow(1.1,bicubic_counter):.2f}.jpg')
+
+        bicubic_counter += 1
+        return new_img
     elif(bicubic_counter == 5):
         show_summary(current_img)
+        bicubic_counter += 1
+        return None
     elif(bicubic_counter >= 5 and bicubic_counter < 10):
 
         h, w, c = image.shape
@@ -210,10 +231,16 @@ def bicubic_interpolation(image):
         print(f"Height: {new_h}, Width: {new_w}")
 
         im = Image.fromarray(current_img)
-        im.save(f'images/new_lena_bicubic_shrinked Scale: {np.pow(1.1,10 - bicubic_counter):.2f}.jpg')
+        im.save(f'images/bicubic/shrinked Scale: {np.pow(1.1,10 - bicubic_counter):.2f}.jpg')
+
+        bicubic_counter += 1
+        return new_img
     elif(bicubic_counter == 10):
         show_summary(current_img)
-    bicubic_counter += 1
-    return new_img
+        bicubic_counter += 1
+        return None
+    else:
+        print("Error! Out of bounds of interpolation number!")
+        exit()
 
 plt.show()
